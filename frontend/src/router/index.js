@@ -26,6 +26,20 @@ const routes = [
     ]
   },
   {
+    path: '/user',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/user/list',
+    meta: { title: '用户管理', icon: 'user' },
+    children: [
+      {
+        path: 'list',
+        name: 'UserList',
+        component: () => import('@/views/user/UserList.vue'),
+        meta: { title: '用户列表' }
+      }
+    ]
+  },
+  {
     path: '/customer',
     component: () => import('@/layout/index.vue'),
     redirect: '/customer/list',
