@@ -1,0 +1,170 @@
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import { getToken } from '@/utils/auth'
+
+Vue.use(VueRouter)
+
+// 路由配置
+const routes = [
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/login/index.vue'),
+    meta: { title: '登录', hidden: true }
+  },
+  {
+    path: '/',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index.vue'),
+        meta: { title: '仪表板', icon: 'dashboard' }
+      }
+    ]
+  },
+  {
+    path: '/customer',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/customer/list',
+    meta: { title: '客户管理', icon: 'user' },
+    children: [
+      {
+        path: 'list',
+        name: 'CustomerList',
+        component: () => import('@/views/customer/list.vue'),
+        meta: { title: '客户列表' }
+      },
+      {
+        path: 'add',
+        name: 'CustomerAdd',
+        component: () => import('@/views/customer/add.vue'),
+        meta: { title: '新增客户' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'CustomerEdit',
+        component: () => import('@/views/customer/edit.vue'),
+        meta: { title: '编辑客户' }
+      }
+    ]
+  },
+  {
+    path: '/contract',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/contract/list',
+    meta: { title: '合同管理', icon: 'document' },
+    children: [
+      {
+        path: 'list',
+        name: 'ContractList',
+        component: () => import('@/views/contract/list.vue'),
+        meta: { title: '合同列表' }
+      },
+      {
+        path: 'add',
+        name: 'ContractAdd',
+        component: () => import('@/views/contract/add.vue'),
+        meta: { title: '新增合同' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'ContractEdit',
+        component: () => import('@/views/contract/edit.vue'),
+        meta: { title: '编辑合同' }
+      }
+    ]
+  },
+  {
+    path: '/finance',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/finance/voucher',
+    meta: { title: '财务管理', icon: 'money' },
+    children: [
+      {
+        path: 'voucher',
+        name: 'VoucherList',
+        component: () => import('@/views/finance/voucher.vue'),
+        meta: { title: '凭证管理' }
+      },
+      {
+        path: 'account',
+        name: 'AccountList',
+        component: () => import('@/views/finance/account.vue'),
+        meta: { title: '科目管理' }
+      },
+      {
+        path: 'report',
+        name: 'FinanceReport',
+        component: () => import('@/views/finance/report.vue'),
+        meta: { title: '财务报表' }
+      }
+    ]
+  },
+  {
+    path: '/system',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/system/user',
+    meta: { title: '系统管理', icon: 'setting' },
+    children: [
+      {
+        path: 'user',
+        name: 'UserList',
+        component: () => import('@/views/system/user.vue'),
+        meta: { title: '用户管理' }
+      },
+      {
+        path: 'role',
+        name: 'RoleList',
+        component: () => import('@/views/system/role.vue'),
+        meta: { title: '角色管理' }
+      }
+    ]
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/error/404.vue'),
+    hidden: true
+  },
+  {
+    path: '*',
+    redirect: '/404',
+    hidden: true
+  }
+]
+
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes
+})
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  // 设置页面标题
+  document.title = to.meta.title ? to.meta.title + ' - IOBAF系统' : 'IOBAF系统'
+  
+  const hasToken = getToken()
+  
+  if (hasToken) {
+    if (to.path === '/login') {
+      // 如果已登录，重定向到首页
+      next({ path: '/' })
+    } else {
+      next()
+    }
+  } else {
+    // 没有token
+    if (to.path === '/login') {
+      // 如果是登录页面，直接进入
+      next()
+    } else {
+      // 其他没有访问权限的页面将被重定向到登录页面
+      next(`/login?redirect=${to.path}`)
+    }
+  }
+})
+
+export default router 
