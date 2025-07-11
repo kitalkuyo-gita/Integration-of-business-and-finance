@@ -81,18 +81,44 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/system',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/system/user',
+    meta: { title: '系统管理', icon: 'setting' },
+    children: [
+      {
+        path: 'user',
+        name: 'UserList',
+        component: () => import('@/views/system/user.vue'),
+        meta: { title: '用户管理' }
+      },
+      {
+        path: 'role',
+        name: 'RoleList',
+        component: () => import('@/views/system/role.vue'),
+        meta: { title: '角色管理' }
+      }
+    ]
+  },
   // 第三阶段：美妆快消品行业功能
   {
     path: '/ecommerce',
     component: () => import('@/layout/index.vue'),
-    redirect: '/ecommerce/order',
-    meta: { title: '电商管理', icon: 'shopping' },
+    redirect: '/ecommerce/orders',
+    meta: { title: '电商订单管理', icon: 'shopping' },
     children: [
       {
-        path: 'order',
+        path: 'orders',
         name: 'OrderList',
         component: () => import('@/views/ecommerce/OrderList.vue'),
-        meta: { title: '订单管理' }
+        meta: { title: '订单列表' }
+      },
+      {
+        path: 'order-detail/:id',
+        name: 'OrderDetail',
+        component: () => import('@/views/ecommerce/OrderDetail.vue'),
+        meta: { title: '订单详情', hidden: true }
       },
       {
         path: 'statistics',
@@ -111,25 +137,25 @@ const routes = [
   {
     path: '/promotion',
     component: () => import('@/layout/index.vue'),
-    redirect: '/promotion/rule',
-    meta: { title: '促销管理', icon: 'gift' },
+    redirect: '/promotion/rules',
+    meta: { title: '促销费用分摊', icon: 'chart' },
     children: [
       {
-        path: 'rule',
-        name: 'PromotionRule',
-        component: () => import('@/views/promotion/PromotionRule.vue'),
-        meta: { title: '促销规则' }
+        path: 'rules',
+        name: 'PromotionRules',
+        component: () => import('@/views/promotion/PromotionRules.vue'),
+        meta: { title: '分摊规则' }
       },
       {
         path: 'allocation',
         name: 'PromotionAllocation',
         component: () => import('@/views/promotion/PromotionAllocation.vue'),
-        meta: { title: '费用分摊' }
+        meta: { title: '分摊记录' }
       },
       {
-        path: 'roi',
-        name: 'PromotionRoi',
-        component: () => import('@/views/promotion/PromotionRoi.vue'),
+        path: 'roi-analysis',
+        name: 'RoiAnalysis',
+        component: () => import('@/views/promotion/RoiAnalysis.vue'),
         meta: { title: 'ROI分析' }
       }
     ]
@@ -138,25 +164,25 @@ const routes = [
   {
     path: '/mes',
     component: () => import('@/layout/index.vue'),
-    redirect: '/mes/process',
-    meta: { title: 'MES管理', icon: 'factory' },
+    redirect: '/mes/process-parameters',
+    meta: { title: 'MES系统集成', icon: 'factory' },
     children: [
       {
-        path: 'process',
-        name: 'ProcessParameter',
-        component: () => import('@/views/mes/ProcessParameter.vue'),
+        path: 'process-parameters',
+        name: 'ProcessParameters',
+        component: () => import('@/views/mes/ProcessParameters.vue'),
         meta: { title: '工艺参数' }
       },
       {
-        path: 'equipment',
+        path: 'equipment-data',
         name: 'EquipmentData',
         component: () => import('@/views/mes/EquipmentData.vue'),
         meta: { title: '设备数据' }
       },
       {
-        path: 'cost',
-        name: 'ProcessCost',
-        component: () => import('@/views/mes/ProcessCost.vue'),
+        path: 'cost-calculation',
+        name: 'CostCalculation',
+        component: () => import('@/views/mes/CostCalculation.vue'),
         meta: { title: '成本计算' }
       }
     ]
@@ -164,72 +190,52 @@ const routes = [
   {
     path: '/quality',
     component: () => import('@/layout/index.vue'),
-    redirect: '/quality/trace',
-    meta: { title: '质量管理', icon: 'check-circle' },
+    redirect: '/quality/traces',
+    meta: { title: '质量追溯', icon: 'search' },
     children: [
       {
-        path: 'trace',
-        name: 'QualityTrace',
-        component: () => import('@/views/quality/QualityTrace.vue'),
-        meta: { title: '质量追溯' }
+        path: 'traces',
+        name: 'QualityTraces',
+        component: () => import('@/views/quality/QualityTraces.vue'),
+        meta: { title: '追溯记录' }
       },
       {
-        path: 'defect',
+        path: 'defect-analysis',
         name: 'DefectAnalysis',
         component: () => import('@/views/quality/DefectAnalysis.vue'),
         meta: { title: '缺陷分析' }
       },
       {
-        path: 'cost',
-        name: 'QualityCost',
-        component: () => import('@/views/quality/QualityCost.vue'),
-        meta: { title: '质量成本' }
+        path: 'lifecycle/:traceCode',
+        name: 'ProductLifecycle',
+        component: () => import('@/views/quality/ProductLifecycle.vue'),
+        meta: { title: '生命周期', hidden: true }
       }
     ]
   },
   {
     path: '/quotation',
     component: () => import('@/layout/index.vue'),
-    redirect: '/quotation/request',
-    meta: { title: '报价管理', icon: 'calculator' },
+    redirect: '/quotation/requests',
+    meta: { title: '定制化报价', icon: 'calculator' },
     children: [
       {
-        path: 'request',
-        name: 'QuotationRequest',
-        component: () => import('@/views/quotation/QuotationRequest.vue'),
+        path: 'requests',
+        name: 'QuotationRequests',
+        component: () => import('@/views/quotation/QuotationRequests.vue'),
         meta: { title: '报价请求' }
       },
       {
-        path: 'result',
-        name: 'QuotationResult',
-        component: () => import('@/views/quotation/QuotationResult.vue'),
+        path: 'results',
+        name: 'QuotationResults',
+        component: () => import('@/views/quotation/QuotationResults.vue'),
         meta: { title: '报价结果' }
       },
       {
-        path: 'analysis',
-        name: 'QuotationAnalysis',
-        component: () => import('@/views/quotation/QuotationAnalysis.vue'),
-        meta: { title: '报价分析' }
-      }
-    ]
-  },
-  {
-    path: '/system',
-    component: () => import('@/layout/index.vue'),
-    redirect: '/system/user',
-    meta: { title: '系统管理', icon: 'setting' },
-    children: [
-      {
-        path: 'user',
-        name: 'UserList',
-        component: () => import('@/views/system/user.vue'),
-        meta: { title: '用户管理' }
-      },
-      {
-        path: 'role',
-        name: 'RoleList',
-        component: () => import('@/views/system/role.vue'),
-        meta: { title: '角色管理' }
+        path: 'quick-quote',
+        name: 'QuickQuote',
+        component: () => import('@/views/quotation/QuickQuote.vue'),
+        meta: { title: '快速报价' }
       }
     ]
   },
