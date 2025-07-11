@@ -48,20 +48,8 @@ const routes = [
       {
         path: 'list',
         name: 'CustomerList',
-        component: () => import('@/views/customer/list.vue'),
+        component: () => import('@/views/customer/CustomerList.vue'),
         meta: { title: '客户列表' }
-      },
-      {
-        path: 'add',
-        name: 'CustomerAdd',
-        component: () => import('@/views/customer/add.vue'),
-        meta: { title: '新增客户' }
-      },
-      {
-        path: 'edit/:id',
-        name: 'CustomerEdit',
-        component: () => import('@/views/customer/edit.vue'),
-        meta: { title: '编辑客户' }
       }
     ]
   },
@@ -74,20 +62,8 @@ const routes = [
       {
         path: 'list',
         name: 'ContractList',
-        component: () => import('@/views/contract/list.vue'),
+        component: () => import('@/views/contract/ContractList.vue'),
         meta: { title: '合同列表' }
-      },
-      {
-        path: 'add',
-        name: 'ContractAdd',
-        component: () => import('@/views/contract/add.vue'),
-        meta: { title: '新增合同' }
-      },
-      {
-        path: 'edit/:id',
-        name: 'ContractEdit',
-        component: () => import('@/views/contract/edit.vue'),
-        meta: { title: '编辑合同' }
       }
     ]
   },
@@ -100,20 +76,8 @@ const routes = [
       {
         path: 'voucher',
         name: 'VoucherList',
-        component: () => import('@/views/finance/voucher.vue'),
+        component: () => import('@/views/finance/VoucherList.vue'),
         meta: { title: '凭证管理' }
-      },
-      {
-        path: 'account',
-        name: 'AccountList',
-        component: () => import('@/views/finance/account.vue'),
-        meta: { title: '科目管理' }
-      },
-      {
-        path: 'report',
-        name: 'FinanceReport',
-        component: () => import('@/views/finance/report.vue'),
-        meta: { title: '财务报表' }
       }
     ]
   },

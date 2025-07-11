@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iobaf.domain.contract.repository.ContractRepository">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.iobaf.domain.contract.entity.Contract">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="contract_no" property="contractNo" jdbcType="VARCHAR"/>
+        <result column="contract_name" property="contractName" jdbcType="VARCHAR"/>
+        <result column="customer_id" property="customerId" jdbcType="BIGINT"/>
+        <result column="contract_amount" property="contractAmount" jdbcType="DECIMAL"/>
+        <result column="contract_type" property="contractType" jdbcType="TINYINT"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="create_user_id" property="createUserId" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 基础字段 -->
+    <sql id="Base_Column_List">
+        id, contract_no, contract_name, customer_id, contract_amount, contract_type,
+        start_date, end_date, status, create_user_id, create_time, update_time
+    </sql>
+
+    <!-- 分页查询合同列表 -->
+    <select id="selectContractPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM biz_contract
+        <where>
+            <if test="contractName != null and contractName != ''">
+                AND contract_name LIKE CONCAT('%', #{contractName}, '%')
+            </if>
+            <if test="contractType != null">
+                AND contract_type = #{contractType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="customerId != null">
+                AND customer_id = #{customerId}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper> 

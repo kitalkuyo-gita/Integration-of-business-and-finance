@@ -1,53 +1,30 @@
 import request from '@/utils/request'
 
-// 获取会计科目列表
-export function getAccountList(params) {
-  return request({
-    url: '/finance/accounts',
-    method: 'get',
-    params
-  })
-}
-
-// 创建会计科目
-export function createAccount(data) {
-  return request({
-    url: '/finance/accounts',
-    method: 'post',
-    data
-  })
-}
-
-// 更新会计科目
-export function updateAccount(id, data) {
-  return request({
-    url: `/finance/accounts/${id}`,
-    method: 'put',
-    data
-  })
-}
-
-// 删除会计科目
-export function deleteAccount(id) {
-  return request({
-    url: `/finance/accounts/${id}`,
-    method: 'delete'
-  })
-}
+/**
+ * 财务管理API接口
+ */
 
 // 获取凭证列表
 export function getVoucherList(params) {
   return request({
-    url: '/finance/vouchers',
+    url: '/api/finance/vouchers',
     method: 'get',
     params
+  })
+}
+
+// 获取凭证详情
+export function getVoucherById(id) {
+  return request({
+    url: `/api/finance/vouchers/${id}`,
+    method: 'get'
   })
 }
 
 // 创建凭证
 export function createVoucher(data) {
   return request({
-    url: '/finance/vouchers',
+    url: '/api/finance/vouchers',
     method: 'post',
     data
   })
@@ -56,7 +33,7 @@ export function createVoucher(data) {
 // 更新凭证
 export function updateVoucher(id, data) {
   return request({
-    url: `/finance/vouchers/${id}`,
+    url: `/api/finance/vouchers/${id}`,
     method: 'put',
     data
   })
@@ -65,17 +42,17 @@ export function updateVoucher(id, data) {
 // 删除凭证
 export function deleteVoucher(id) {
   return request({
-    url: `/finance/vouchers/${id}`,
+    url: `/api/finance/vouchers/${id}`,
     method: 'delete'
   })
 }
 
 // 审核凭证
-export function auditVoucher(id, data) {
+export function auditVoucher(id, auditUserId) {
   return request({
-    url: `/finance/vouchers/${id}/audit`,
+    url: `/api/finance/vouchers/${id}/audit`,
     method: 'post',
-    data
+    params: { auditUserId }
   })
 }
 

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iobaf.domain.finance.repository.VoucherRepository">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.iobaf.domain.finance.entity.Voucher">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="voucher_no" property="voucherNo" jdbcType="VARCHAR"/>
+        <result column="voucher_date" property="voucherDate" jdbcType="DATE"/>
+        <result column="summary" property="summary" jdbcType="VARCHAR"/>
+        <result column="total_amount" property="totalAmount" jdbcType="DECIMAL"/>
+        <result column="voucher_type" property="voucherType" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="create_user_id" property="createUserId" jdbcType="BIGINT"/>
+        <result column="audit_user_id" property="auditUserId" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 基础字段 -->
+    <sql id="Base_Column_List">
+        id, voucher_no, voucher_date, summary, total_amount, voucher_type,
+        status, create_user_id, audit_user_id, create_time, audit_time
+    </sql>
+
+    <!-- 分页查询凭证列表 -->
+    <select id="selectVoucherPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM fin_voucher
+        <where>
+            <if test="voucherNo != null and voucherNo != ''">
+                AND voucher_no LIKE CONCAT('%', #{voucherNo}, '%')
+            </if>
+            <if test="voucherType != null">
+                AND voucher_type = #{voucherType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND voucher_date >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND voucher_date &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper> 
