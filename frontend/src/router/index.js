@@ -81,6 +81,138 @@ const routes = [
       }
     ]
   },
+  // 第三阶段：美妆快消品行业功能
+  {
+    path: '/ecommerce',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/ecommerce/order',
+    meta: { title: '电商管理', icon: 'shopping' },
+    children: [
+      {
+        path: 'order',
+        name: 'OrderList',
+        component: () => import('@/views/ecommerce/OrderList.vue'),
+        meta: { title: '订单管理' }
+      },
+      {
+        path: 'statistics',
+        name: 'OrderStatistics',
+        component: () => import('@/views/ecommerce/OrderStatistics.vue'),
+        meta: { title: '订单统计' }
+      },
+      {
+        path: 'expiring',
+        name: 'ExpiringProducts',
+        component: () => import('@/views/ecommerce/ExpiringProducts.vue'),
+        meta: { title: '临期预警' }
+      }
+    ]
+  },
+  {
+    path: '/promotion',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/promotion/rule',
+    meta: { title: '促销管理', icon: 'gift' },
+    children: [
+      {
+        path: 'rule',
+        name: 'PromotionRule',
+        component: () => import('@/views/promotion/PromotionRule.vue'),
+        meta: { title: '促销规则' }
+      },
+      {
+        path: 'allocation',
+        name: 'PromotionAllocation',
+        component: () => import('@/views/promotion/PromotionAllocation.vue'),
+        meta: { title: '费用分摊' }
+      },
+      {
+        path: 'roi',
+        name: 'PromotionRoi',
+        component: () => import('@/views/promotion/PromotionRoi.vue'),
+        meta: { title: 'ROI分析' }
+      }
+    ]
+  },
+  // 第三阶段：精密金属零部件行业功能
+  {
+    path: '/mes',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/mes/process',
+    meta: { title: 'MES管理', icon: 'factory' },
+    children: [
+      {
+        path: 'process',
+        name: 'ProcessParameter',
+        component: () => import('@/views/mes/ProcessParameter.vue'),
+        meta: { title: '工艺参数' }
+      },
+      {
+        path: 'equipment',
+        name: 'EquipmentData',
+        component: () => import('@/views/mes/EquipmentData.vue'),
+        meta: { title: '设备数据' }
+      },
+      {
+        path: 'cost',
+        name: 'ProcessCost',
+        component: () => import('@/views/mes/ProcessCost.vue'),
+        meta: { title: '成本计算' }
+      }
+    ]
+  },
+  {
+    path: '/quality',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/quality/trace',
+    meta: { title: '质量管理', icon: 'check-circle' },
+    children: [
+      {
+        path: 'trace',
+        name: 'QualityTrace',
+        component: () => import('@/views/quality/QualityTrace.vue'),
+        meta: { title: '质量追溯' }
+      },
+      {
+        path: 'defect',
+        name: 'DefectAnalysis',
+        component: () => import('@/views/quality/DefectAnalysis.vue'),
+        meta: { title: '缺陷分析' }
+      },
+      {
+        path: 'cost',
+        name: 'QualityCost',
+        component: () => import('@/views/quality/QualityCost.vue'),
+        meta: { title: '质量成本' }
+      }
+    ]
+  },
+  {
+    path: '/quotation',
+    component: () => import('@/layout/index.vue'),
+    redirect: '/quotation/request',
+    meta: { title: '报价管理', icon: 'calculator' },
+    children: [
+      {
+        path: 'request',
+        name: 'QuotationRequest',
+        component: () => import('@/views/quotation/QuotationRequest.vue'),
+        meta: { title: '报价请求' }
+      },
+      {
+        path: 'result',
+        name: 'QuotationResult',
+        component: () => import('@/views/quotation/QuotationResult.vue'),
+        meta: { title: '报价结果' }
+      },
+      {
+        path: 'analysis',
+        name: 'QuotationAnalysis',
+        component: () => import('@/views/quotation/QuotationAnalysis.vue'),
+        meta: { title: '报价分析' }
+      }
+    ]
+  },
   {
     path: '/system',
     component: () => import('@/layout/index.vue'),
