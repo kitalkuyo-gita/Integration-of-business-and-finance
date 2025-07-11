@@ -9,15 +9,13 @@ import com.iobaf.domain.mes.service.ProcessParameterService;
 import com.iobaf.domain.mes.service.EquipmentDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 /**
- * MES系统集成控制器
+ * MES系统控制器
  * 提供工艺参数管理、设备数据采集、成本计算等功能
  * 
  * @author iobaf
@@ -39,27 +37,25 @@ public class MesController {
      * 
      * @param current 当前页
      * @param size 每页大小
-     * @param workOrderNo 工单号
-     * @param productCode 产品编码
-     * @param processCode 工序编码
+     * @param parameterName 参数名称
      * @param parameterType 参数类型
+     * @param equipmentId 设备ID
      * @return 工艺参数分页数据
      */
     @GetMapping("/process-parameters")
     public Result<IPage<ProcessParameter>> getProcessParameterPage(
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(required = false) String workOrderNo,
-            @RequestParam(required = false) String productCode,
-            @RequestParam(required = false) String processCode,
-            @RequestParam(required = false) String parameterType) {
+            @RequestParam(required = false) String parameterName,
+            @RequestParam(required = false) String parameterType,
+            @RequestParam(required = false) Long equipmentId) {
         
-        log.info("查询工艺参数列表，参数：current={}, size={}, workOrderNo={}, productCode={}, processCode={}, parameterType={}",
-                current, size, workOrderNo, productCode, processCode, parameterType);
+        log.info("查询工艺参数列表，参数：current={}, size={}, parameterName={}, parameterType={}, equipmentId={}",
+                current, size, parameterName, parameterType, equipmentId);
         
         try {
             Page<ProcessParameter> page = new Page<>(current, size);
-            IPage<ProcessParameter> result = processParameterService.getProcessParameterPage(page, workOrderNo, productCode, processCode, parameterType);
+            IPage<ProcessParameter> result = processParameterService.getProcessParameterPage(page, parameterName, parameterType, equipmentId);
             return Result.success(result);
         } catch (Exception e) {
             log.error("查询工艺参数列表失败", e);
@@ -162,29 +158,163 @@ public class MesController {
     }
 
     /**
+     * 根据设备ID查询工艺参数
+     * 
+     * @param equipmentId 设备ID
+     * @return 工艺参数列表
+     */
+    @GetMapping("/process-parameters/equipment/{equipmentId}")
+    public Result<List<ProcessParameter>> getProcessParametersByEquipmentId(@PathVariable Long equipmentId) {
+        log.info("查询设备工艺参数，equipmentId={}", equipmentId);
+        
+        try {
+            List<ProcessParameter> parameters = processParameterService.getProcessParametersByEquipmentId(equipmentId);
+            return Result.success(parameters);
+        } catch (Exception e) {
+            log.error("查询设备工艺参数失败，equipmentId={}", equipmentId, e);
+            return Result.error("查询设备工艺参数失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 根据参数类型查询工艺参数
+     * 
+     * @param parameterType 参数类型
+     * @return 工艺参数列表
+     */
+    @GetMapping("/process-parameters/type/{parameterType}")
+    public Result<List<ProcessParameter>> getProcessParametersByType(@PathVariable String parameterType) {
+        log.info("查询工艺参数，parameterType={}", parameterType);
+        
+        try {
+            List<ProcessParameter> parameters = processParameterService.getProcessParametersByType(parameterType);
+            return Result.success(parameters);
+        } catch (Exception e) {
+            log.error("查询工艺参数失败，parameterType={}", parameterType, e);
+            return Result.error("查询工艺参数失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 批量创建工艺参数
+     * 
+     * @param parameters 工艺参数列表
+     * @return 创建数量
+     */
+    @PostMapping("/process-parameters/batch")
+    public Result<Integer> batchCreateProcessParameters(@RequestBody List<ProcessParameter> parameters) {
+        log.info("批量创建工艺参数，参数数量={}", parameters.size());
+        
+        try {
+            int result = processParameterService.batchCreateProcessParameters(parameters);
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("批量创建工艺参数失败", e);
+            return Result.error("批量创建工艺参数失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 批量更新工艺参数
+     * 
+     * @param parameters 工艺参数列表
+     * @return 更新数量
+     */
+    @PutMapping("/process-parameters/batch")
+    public Result<Integer> batchUpdateProcessParameters(@RequestBody List<ProcessParameter> parameters) {
+        log.info("批量更新工艺参数，参数数量={}", parameters.size());
+        
+        try {
+            int result = processParameterService.batchUpdateProcessParameters(parameters);
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("批量更新工艺参数失败", e);
+            return Result.error("批量更新工艺参数失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 批量删除工艺参数
+     * 
+     * @param parameterIds 参数ID列表
+     * @return 删除数量
+     */
+    @DeleteMapping("/process-parameters/batch")
+    public Result<Integer> batchDeleteProcessParameters(@RequestBody List<Long> parameterIds) {
+        log.info("批量删除工艺参数，参数ID数量={}", parameterIds.size());
+        
+        try {
+            int result = processParameterService.batchDeleteProcessParameters(parameterIds);
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("批量删除工艺参数失败", e);
+            return Result.error("批量删除工艺参数失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 计算工艺成本
+     * 
+     * @param equipmentId 设备ID
+     * @param processTime 加工时间
+     * @param materialCost 材料成本
+     * @return 成本计算结果
+     */
+    @PostMapping("/process-cost/calculate")
+    public Result<Map<String, Object>> calculateProcessCost(@RequestParam Long equipmentId,
+                                                          @RequestParam Double processTime,
+                                                          @RequestParam Double materialCost) {
+        log.info("计算工艺成本，equipmentId={}, processTime={}, materialCost={}", equipmentId, processTime, materialCost);
+        
+        try {
+            Map<String, Object> result = processParameterService.calculateProcessCost(equipmentId, processTime, materialCost);
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("计算工艺成本失败", e);
+            return Result.error("计算工艺成本失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取工艺参数统计信息
+     * 
+     * @return 统计信息
+     */
+    @GetMapping("/process-parameters/statistics")
+    public Result<Map<String, Object>> getProcessParameterStatistics() {
+        log.info("获取工艺参数统计信息");
+        
+        try {
+            Map<String, Object> statistics = processParameterService.getProcessParameterStatistics();
+            return Result.success(statistics);
+        } catch (Exception e) {
+            log.error("获取工艺参数统计信息失败", e);
+            return Result.error("获取工艺参数统计信息失败：" + e.getMessage());
+        }
+    }
+
+    /**
      * 分页查询设备数据列表
      * 
      * @param current 当前页
      * @param size 每页大小
-     * @param equipmentCode 设备编码
+     * @param equipmentId 设备ID
      * @param dataType 数据类型
-     * @param runningStatus 运行状态
      * @return 设备数据分页数据
      */
     @GetMapping("/equipment-data")
     public Result<IPage<EquipmentData>> getEquipmentDataPage(
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(required = false) String equipmentCode,
-            @RequestParam(required = false) String dataType,
-            @RequestParam(required = false) String runningStatus) {
+            @RequestParam(required = false) Long equipmentId,
+            @RequestParam(required = false) String dataType) {
         
-        log.info("查询设备数据列表，参数：current={}, size={}, equipmentCode={}, dataType={}, runningStatus={}",
-                current, size, equipmentCode, dataType, runningStatus);
+        log.info("查询设备数据列表，参数：current={}, size={}, equipmentId={}, dataType={}",
+                current, size, equipmentId, dataType);
         
         try {
             Page<EquipmentData> page = new Page<>(current, size);
-            IPage<EquipmentData> result = equipmentDataService.getEquipmentDataPage(page, equipmentCode, dataType, runningStatus);
+            IPage<EquipmentData> result = equipmentDataService.getEquipmentDataPage(page, equipmentId, dataType);
             return Result.success(result);
         } catch (Exception e) {
             log.error("查询设备数据列表失败", e);
@@ -283,105 +413,6 @@ public class MesController {
         } catch (Exception e) {
             log.error("删除设备数据失败，dataId={}", dataId, e);
             return Result.error("删除设备数据失败：" + e.getMessage());
-        }
-    }
-
-    /**
-     * 计算工艺成本
-     * 
-     * @param workOrderNo 工单号
-     * @param productCode 产品编码
-     * @return 成本计算结果
-     */
-    @PostMapping("/cost-calculation")
-    public Result<Map<String, Object>> calculateProcessCost(@RequestParam String workOrderNo,
-                                                          @RequestParam String productCode) {
-        log.info("计算工艺成本，workOrderNo={}, productCode={}", workOrderNo, productCode);
-        
-        try {
-            Map<String, Object> costResult = processParameterService.calculateProcessCost(workOrderNo, productCode);
-            return Result.success(costResult);
-        } catch (Exception e) {
-            log.error("计算工艺成本失败，workOrderNo={}", workOrderNo, e);
-            return Result.error("计算工艺成本失败：" + e.getMessage());
-        }
-    }
-
-    /**
-     * 获取设备能耗分析
-     * 
-     * @param equipmentCode 设备编码
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 能耗分析数据
-     */
-    @GetMapping("/energy-analysis")
-    public Result<Map<String, Object>> getEnergyAnalysis(@RequestParam String equipmentCode,
-                                                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
-                                                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime) {
-        log.info("获取设备能耗分析，equipmentCode={}, startTime={}, endTime={}", equipmentCode, startTime, endTime);
-        
-        try {
-            Map<String, Object> energyData = equipmentDataService.getEnergyAnalysis(equipmentCode, startTime, endTime);
-            return Result.success(energyData);
-        } catch (Exception e) {
-            log.error("获取设备能耗分析失败，equipmentCode={}", equipmentCode, e);
-            return Result.error("获取设备能耗分析失败：" + e.getMessage());
-        }
-    }
-
-    /**
-     * 获取设备运行效率分析
-     * 
-     * @param equipmentCode 设备编码
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 运行效率分析数据
-     */
-    @GetMapping("/efficiency-analysis")
-    public Result<Map<String, Object>> getEfficiencyAnalysis(@RequestParam String equipmentCode,
-                                                            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
-                                                            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime) {
-        log.info("获取设备运行效率分析，equipmentCode={}, startTime={}, endTime={}", equipmentCode, startTime, endTime);
-        
-        try {
-            Map<String, Object> efficiencyData = equipmentDataService.getEfficiencyAnalysis(equipmentCode, startTime, endTime);
-            return Result.success(efficiencyData);
-        } catch (Exception e) {
-            log.error("获取设备运行效率分析失败，equipmentCode={}", equipmentCode, e);
-            return Result.error("获取设备运行效率分析失败：" + e.getMessage());
-        }
-    }
-
-    /**
-     * 同步MES系统数据
-     * 
-     * @param dataType 数据类型（PROCESS_PARAMETER-工艺参数, EQUIPMENT_DATA-设备数据）
-     * @param data 同步数据
-     * @return 同步结果
-     */
-    @PostMapping("/sync/{dataType}")
-    public Result<Boolean> syncMesData(@PathVariable String dataType, @RequestBody Map<String, Object> data) {
-        log.info("同步MES系统数据，dataType={}", dataType);
-        
-        try {
-            boolean result = false;
-            if ("PROCESS_PARAMETER".equals(dataType)) {
-                result = processParameterService.syncMesData(data);
-            } else if ("EQUIPMENT_DATA".equals(dataType)) {
-                result = equipmentDataService.syncMesData(data);
-            } else {
-                return Result.error("不支持的数据类型：" + dataType);
-            }
-            
-            if (result) {
-                return Result.success(true);
-            } else {
-                return Result.error("同步MES系统数据失败");
-            }
-        } catch (Exception e) {
-            log.error("同步MES系统数据失败，dataType={}", dataType, e);
-            return Result.error("同步MES系统数据失败：" + e.getMessage());
         }
     }
 } 
